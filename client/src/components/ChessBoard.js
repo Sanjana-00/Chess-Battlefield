@@ -2,77 +2,97 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
 
-
-const socket = io("http://localhost:3000");
-
-function ChessBoard() {
+function ChessBoard({ mode }) {
   const chessRef = useRef(new Chess());
   const chess = chessRef.current;
+
+  const socketRef = useRef(null);
 
   const [board, setBoard] = useState(chess.board());
   const [playerRole, setPlayerRole] = useState(null);
   const [turn, setTurn] = useState("White");
   const [dragged, setDragged] = useState(null);
   const [gameOver, setGameOver] = useState(false);
-  const [result, setResult] = useState(null); 
+  const [result, setResult] = useState(null);
   const [inCheck, setInCheck] = useState(false);
 
-
+  // ================= SOCKET (MULTIPLAYER) =================
   useEffect(() => {
-    socket.on("playerRole", (role) => {
-      setPlayerRole(role);
-    });
+    if (mode === "multi") {
+      socketRef.current = io("http://localhost:3000");
 
-    socket.on("spectatorRole", () => {
-      setPlayerRole(null);
-    });
+      socketRef.current.on("playerRole", (role) => {
+        setPlayerRole(role);
+      });
 
-    socket.on("boardState", (fen) => {
-      chess.load(fen);
-      setBoard([...chess.board()]);
-      setTurn(chess.turn() === "w" ? "White" : "Black");
+      socketRef.current.on("spectatorRole", () => {
+        setPlayerRole(null);
+      });
 
-      setInCheck(chess.isCheck());
-      
-      if (!gameOver) {
-        if (chess.isCheckmate()) {
-          const winner = chess.turn() === "w" ? "Black" : "White";
-          setResult(`${winner} Wins by Checkmate!`);
-          setGameOver(true);
-        } else if (chess.isDraw()) {
-          setResult("Game Draw!");
-          setGameOver(true);
+      socketRef.current.on("boardState", (fen) => {
+        chess.load(fen);
+        setBoard([...chess.board()]);
+        setTurn(chess.turn() === "w" ? "White" : "Black");
+
+        setInCheck(chess.isCheck());
+
+        if (!gameOver) {
+          if (chess.isCheckmate()) {
+            const winner = chess.turn() === "w" ? "Black" : "White";
+            setResult(`${winner} Wins by Checkmate!`);
+            setGameOver(true);
+          } else if (chess.isDraw()) {
+            setResult("Game Draw!");
+            setGameOver(true);
+          }
         }
+      });
+
+      socketRef.current.on("gameRestarted", () => {
+        chess.reset();
+        setBoard([...chess.board()]);
+        setTurn("White");
+        setGameOver(false);
+        setResult(null);
+      });
+
+      return () => {
+        socketRef.current.disconnect();
+      };
+    }
+  }, [mode]);
+
+  // ================= AI FUNCTION =================
+  const getAIMove = async (history) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/ai-move", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ moves: history }),
+      });
+
+      if (!res.ok) {
+        console.error("AI API failed:", res.status);
+        return null;
       }
-    });
 
-    socket.on("gameRestarted", () => {
-      chess.reset();
-      setBoard([...chess.board()]);
-      setTurn("White");
-      setGameOver(false);
-      setResult(null); // ✅ RESET RESULT
-    });
+      const data = await res.json();
 
-    return () => {
-      socket.off("playerRole");
-      socket.off("spectatorRole");
-      socket.off("boardState");
-      socket.off("gameRestarted");
-    };
-  }, [chess, gameOver]);
+      if (!data.move) {
+        console.error("No move returned from AI");
+        return null;
+      }
 
-  const getPieceUnicode = (piece) => {
-    if (!piece) return "";
-
-    const map = {
-      wp: "♙", wr: "♖", wn: "♘", wb: "♗", wq: "♕", wk: "♔",
-      bp: "♟", br: "♜", bn: "♞", bb: "♝", bq: "♛", bk: "♚",
-    };
-
-    return map[piece.color + piece.type];
+      return data.move;
+    } catch (err) {
+      console.error("Fetch error:", err);
+      return null;
+    }
   };
 
+  // ================= MOVE HANDLER =================
   const handleMove = (fromRow, fromCol, toRow, toCol) => {
     if (gameOver) return;
 
@@ -88,33 +108,73 @@ function ChessBoard() {
       if (result) {
         setBoard([...chess.board()]);
         setTurn(chess.turn() === "w" ? "White" : "Black");
-        socket.emit("move", move);
+
+        // 🔥 MULTIPLAYER
+        if (mode === "multi") {
+          socketRef.current.emit("move", move);
+        }
+
+        // 🤖 AI MODE
+        if (mode === "ai") {
+          setTimeout(async () => {
+            const history = chess
+              .history({ verbose: true })
+              .map((m) => m.from + m.to);
+
+            const aiMove = await getAIMove(history);
+
+            console.log("AI move:", aiMove);
+
+            if (!aiMove) return;
+
+            chess.move({
+              from: aiMove.slice(0, 2),
+              to: aiMove.slice(2, 4),
+              promotion: "q",
+            });
+
+            setBoard([...chess.board()]);
+            setTurn(chess.turn() === "w" ? "White" : "Black");
+          }, 500);
+        }
       }
     } catch (err) {
-      console.log("Invalid move prevented:", move);
+      console.log("Invalid move:", move);
     }
   };
 
+  // ================= RESTART =================
   const handleRestart = () => {
     chess.reset();
     setBoard([...chess.board()]);
     setTurn("White");
     setGameOver(false);
     setResult(null);
-    socket.emit("restartGame");
+
+    if (mode === "multi") {
+      socketRef.current.emit("restartGame");
+    }
+  };
+
+  // ================= UI =================
+  const getPieceUnicode = (piece) => {
+    if (!piece) return "";
+
+    const map = {
+      wp: "♙", wr: "♖", wn: "♘", wb: "♗", wq: "♕", wk: "♔",
+      bp: "♟", br: "♜", bn: "♞", bb: "♝", bq: "♛", bk: "♚",
+    };
+
+    return map[piece.color + piece.type];
   };
 
   return (
     <div style={{ textAlign: "center" }}>
-      
-      {/* ✅ RESULT DISPLAY */}
-      {result && (
-        <h2 style={{ color: "red" }}>{result}</h2>
-      )}
+      {result && <h2 style={{ color: "red" }}>{result}</h2>}
 
       {inCheck && !gameOver && (
-    <h3 style={{ color: "orange" }}>⚠ CHECK!</h3>
-  )}
+        <h3 style={{ color: "orange" }}>⚠ CHECK!</h3>
+      )}
 
       <h2>{turn}'s Turn</h2>
 
@@ -125,7 +185,7 @@ function ChessBoard() {
           width: "480px",
           margin: "auto",
           border: "3px solid #FFD700",
-           boxShadow: "0 0 25px rgba(255,215,0,0.4)",
+          boxShadow: "0 0 25px rgba(255,215,0,0.4)",
         }}
       >
         {board.map((row, rowIndex) =>
@@ -161,14 +221,20 @@ function ChessBoard() {
                   <div
                     draggable={
                       !gameOver &&
-                      playerRole &&
                       (
-                        (playerRole === "white" &&
+                        (mode === "multi" &&
+                          playerRole &&
+                          (
+                            (playerRole === "white" &&
+                              square.color === "w" &&
+                              turn === "White") ||
+                            (playerRole === "black" &&
+                              square.color === "b" &&
+                              turn === "Black")
+                          )) ||
+                        (mode === "ai" &&
                           square.color === "w" &&
-                          turn === "White") ||
-                        (playerRole === "black" &&
-                          square.color === "b" &&
-                          turn === "Black")
+                          turn === "White")
                       )
                     }
                     onDragStart={() =>
@@ -190,7 +256,7 @@ function ChessBoard() {
 
       <br />
 
-      <button onClick={handleRestart} disabled={!playerRole}>
+      <button onClick={handleRestart}>
         Restart Game
       </button>
     </div>
