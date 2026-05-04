@@ -1,0 +1,124 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0d0d0d;
+  color: white;
+}
+
+/* HERO */
+.hero {
+  height: 100vh;
+  background-image: url('./assets/bg.png');
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: 60px;
+  animation: fadeIn 2s ease;
+}
+
+.hero p {
+  margin: 10px 0;
+  opacity: 0.8;
+}
+
+.hero button {
+  padding: 10px 20px;
+  background: #111;
+  color: white;
+  border: 1px solid white;
+  cursor: pointer;
+}
+
+/* LOGIN */
+.login {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(to bottom, #000, #0a0a0a);
+}
+
+/* 🔥 Premium card */
+.login-box {
+  width: 320px;
+  padding: 40px 30px;
+
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.4); /* gold border */
+
+  border-radius: 12px;
+  text-align: center;
+
+  box-shadow:
+    0 0 20px rgba(212, 175, 55, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
+
+  backdrop-filter: blur(10px);
+}
+
+/* Title */
+.login-box h2 {
+  margin-bottom: 25px;
+  color: #d4af37; /* gold */
+  letter-spacing: 1px;
+}
+
+/* Inputs */
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 6px;
+
+  color: white;
+  outline: none;
+  transition: 0.3s;
+}
+
+.login-box input:focus {
+  border: 1px solid #d4af37;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+/* Button */
+.login-box button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+
+  background: linear-gradient(45deg, #d4af37, #b8962e);
+  border: none;
+  border-radius: 6px;
+
+  color: black;
+  font-weight: bold;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-box button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+/* Register text */
+.login-box p {
+  margin-top: 15px;
+  color: #aaa;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-box p:hover {
+  color: #d4af37;
+}

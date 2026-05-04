@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import "./Login.css";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,43 +12,56 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(
-        "http://localhost:3000/Login",
+      await axios.post(
+        "http://localhost:3000/login",
         { email, password },
         { withCredentials: true }
       );
-
-      console.log(res.data);
       navigate("/game");
     } catch (err) {
-      console.log(err);
       alert("Login failed");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container">
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      {/* 🔥 HERO SECTION */}
+      <section className="hero">
+        <h1>♟ Chess Battlefield</h1>
+        <p>Where strategy meets war.</p>
+        <button onClick={() => window.scrollTo({ top: 600, behavior: "smooth" })}>
+          Enter the Arena
+        </button>
+      </section>
 
-      <br /><br />
+      {/* 🔐 LOGIN SECTION */}
+      <section className="login">
+        <div className="login-box">
+          <h2>Login</h2>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <input
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-      <br /><br />
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      <button onClick={handleLogin}>Login</button>
+          <button onClick={handleLogin}>Login</button>
+
+          <p onClick={() => navigate("/register")}>
+            Don’t have an account? Register
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 }
 
-export default Login;   // 🔥 THIS LINE IS MANDATORY
+export default Login;
