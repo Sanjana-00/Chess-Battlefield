@@ -39,15 +39,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  background: linear-gradient(to bottom, #000, #0a0a0a);
+  background-image: url('./assets/login.png');
+  
 }
 
 /* 🔥 Premium card */
 .login-box {
   width: 320px;
   padding: 40px 30px;
-
+  transform: translateX(120px);
   background: rgba(10, 10, 10, 0.9);
   border: 1px solid rgba(212, 175, 55, 0.4); /* gold border */
 
@@ -70,7 +70,7 @@ body {
 
 /* Inputs */
 .login-box input {
-  width: 100%;
+  width: 90%;
   padding: 12px;
   margin: 10px 0;
 

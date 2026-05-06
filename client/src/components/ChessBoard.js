@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { Chess } from "chess.js";
+import "./ChessBoard.css";
 
 function ChessBoard({ mode }) {
   const chessRef = useRef(new Chess());
@@ -168,99 +169,107 @@ function ChessBoard({ mode }) {
     return map[piece.color + piece.type];
   };
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      {result && <h2 style={{ color: "red" }}>{result}</h2>}
+ return (
+  <div className="chess-page">
 
-      {inCheck && !gameOver && (
-        <h3 style={{ color: "orange" }}>⚠ CHECK!</h3>
+    {result && (
+      <h2 className="result-text">
+        {result}
+      </h2>
+    )}
+
+    {inCheck && !gameOver && (
+      <h3 className="check-text">
+        ⚠ CHECK!
+      </h3>
+    )}
+
+    <h2 className="turn-text">
+      {turn}'s Turn
+    </h2>
+
+    <div className="board-container">
+      {board.map((row, rowIndex) =>
+        row.map((square, colIndex) => {
+          const isLight = (rowIndex + colIndex) % 2 === 0;
+
+          return (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              className={`square ${isLight ? "light" : "dark"}`}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => {
+                if (!dragged || gameOver) return;
+
+                handleMove(
+                  dragged.row,
+                  dragged.col,
+                  rowIndex,
+                  colIndex
+                );
+
+                setDragged(null);
+              }}
+            >
+              {square && (
+                <div
+                  draggable={
+                    !gameOver &&
+                    (
+                      (mode === "multi" &&
+                        playerRole &&
+                        (
+                          (playerRole === "white" &&
+                            square.color === "w" &&
+                            turn === "White") ||
+
+                          (playerRole === "black" &&
+                            square.color === "b" &&
+                            turn === "Black")
+                        )) ||
+
+                      (mode === "ai" &&
+                        square.color === "w" &&
+                        turn === "White")
+                    )
+                  }
+                  onDragStart={() =>
+                    setDragged({
+                      row: rowIndex,
+                      col: colIndex,
+                    })
+                  }
+                  className="piece"
+                  style={{
+                    color:
+                      square.color === "w"
+                        ? "#ffffff"
+                        : "#000000",
+
+                    cursor:
+                      gameOver
+                        ? "not-allowed"
+                        : "grab",
+                  }}
+                >
+                  {getPieceUnicode(square)}
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
-
-      <h2>{turn}'s Turn</h2>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(8, 60px)",
-          width: "480px",
-          margin: "auto",
-          border: "3px solid #FFD700",
-          boxShadow: "0 0 25px rgba(255,215,0,0.4)",
-        }}
-      >
-        {board.map((row, rowIndex) =>
-          row.map((square, colIndex) => {
-            const isLight = (rowIndex + colIndex) % 2 === 0;
-
-            return (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  backgroundColor: isLight ? "#f0d9b5" : "#b58863",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  fontSize: "32px",
-                }}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => {
-                  if (!dragged || gameOver) return;
-
-                  handleMove(
-                    dragged.row,
-                    dragged.col,
-                    rowIndex,
-                    colIndex
-                  );
-                  setDragged(null);
-                }}
-              >
-                {square && (
-                  <div
-                    draggable={
-                      !gameOver &&
-                      (
-                        (mode === "multi" &&
-                          playerRole &&
-                          (
-                            (playerRole === "white" &&
-                              square.color === "w" &&
-                              turn === "White") ||
-                            (playerRole === "black" &&
-                              square.color === "b" &&
-                              turn === "Black")
-                          )) ||
-                        (mode === "ai" &&
-                          square.color === "w" &&
-                          turn === "White")
-                      )
-                    }
-                    onDragStart={() =>
-                      setDragged({ row: rowIndex, col: colIndex })
-                    }
-                    style={{
-                      cursor: gameOver ? "not-allowed" : "grab",
-                      color: square.color === "w" ? "#ffffff" : "#000000",
-                    }}
-                  >
-                    {getPieceUnicode(square)}
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <br />
-
-      <button onClick={handleRestart}>
-        Restart Game
-      </button>
     </div>
-  );
+
+    <button
+      className="restart-btn"
+      onClick={handleRestart}
+    >
+      ↻ Restart Game
+    </button>
+
+  </div>
+);
 }
 
 export default ChessBoard;

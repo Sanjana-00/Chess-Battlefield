@@ -17,7 +17,7 @@ function Login() {
         { email, password },
         { withCredentials: true }
       );
-      navigate("/game");
+      navigate("/mode");
     } catch (err) {
       alert("Login failed");
     }
