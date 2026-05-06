@@ -1,42 +1,95 @@
-# ♟ Real-Time Chess Game
+# ♟ Chess Battlefield
 
-A real-time chess application built using **Node.js, Express, Socket.io, and chess.js**.
+An AI Powered Real-Time Multiplayer Chess Platform built using the **MERN Stack**, **Socket.IO**, and **Stockfish AI**.
 
-This project allows two players to compete live in a synchronized chess match with server-side move validation and spectator support.
+Chess Battlefield delivers an immersive chess experience with real-time multiplayer gameplay, AI opponent mode, premium themed UI, live move synchronization, and server-side move validation.
 
 
-## 🚀 Features
+---
 
-- ♟ Real-time multiplayer gameplay
-- 🔄 Live board synchronization using Socket.io
+# 🚀 Features
+
+- ♟ Real-time multiplayer chess gameplay
+- 🤖 Play against AI powered by Stockfish
+- 🔄 Live board synchronization using Socket.IO
 - 🧠 Server-side move validation using chess.js
-- 🎭 Automatic player role assignment (White / Black / Spectator)
-- 🛑 Illegal move prevention
+- 👥 Automatic player role assignment
 - 👀 Spectator mode support
+- ⚡ Real-time game updates
+- 🛑 Illegal move prevention
+- 🎨 Premium cinematic chess-themed UI
 - ♻️ Board state synchronization using FEN notation
+- 🔐 Login and Registration system
+- 📱 Responsive modern interface
 
 
-## 🛠 Tech Stack
+---
 
-### Backend
+# 🛠 Tech Stack
+
+## Frontend
+- React.js
+- CSS3
+- JavaScript
+- Socket.IO Client
+
+## Backend
 - Node.js
 - Express.js
-- Socket.io
+- Socket.IO
 - chess.js
 
+## Database
+- MongoDB
+
+## AI Engine
+- Stockfish
+
+
+---
+
+# ⚙️ How It Works
+
+1. Users can log in and choose between Multiplayer or AI mode.
+2. Players are automatically assigned roles (White / Black).
+3. Moves are sent to the server using WebSockets.
+4. The server validates every move using chess.js.
+5. Valid moves are synchronized instantly across all clients.
+6. In AI mode, Stockfish generates intelligent counter moves.
+
+
+---
+
+# ▶️ Run Locally
+
+## Clone the repository
+
+```bash
+git clone https://github.com/Sanjana-00/Chess-Battlefield.git
+```
+
+## Install dependencies
+
+### Client
+```bash
+cd client
+npm install
+```
+
+### Server
+```bash
+cd server
+npm install
+```
+
+## Start the project
+
 ### Frontend
-- HTML
-- CSS (Tailwind)
-- JavaScript
+```bash
+npm start
+```
 
-
-## ⚙️ How It Works
-
-1. When users connect, roles are automatically assigned.
-2. Moves are sent to the server via WebSockets.
-3. The server validates moves using chess.js.
-4. Valid moves are broadcast to all connected clients.
-5. The board state is synchronized using FEN strings.
-
-
-
+### Backend
+```bash
+node app.js
+```
