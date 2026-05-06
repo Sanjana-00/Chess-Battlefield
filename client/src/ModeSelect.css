@@ -1,0 +1,124 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+}
+
+.mode-container {
+  height: 100vh;
+
+  background:
+    linear-gradient(rgba(0,0,0,0.7),
+    rgba(0,0,0,0.8)),
+    url("https://images.unsplash.com/photo-1528819622765-d6bcf132f793");
+
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: white;
+}
+
+.overlay {
+  text-align: center;
+  width: 100%;
+}
+
+.title {
+  font-size: 64px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.title span {
+  color: #f5c542;
+}
+
+.subtitle {
+  margin-top: 10px;
+  font-size: 22px;
+  color: #ccc;
+}
+
+.card-wrapper {
+  margin-top: 60px;
+
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.mode-card {
+  width: 320px;
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.2);
+
+  backdrop-filter: blur(10px);
+
+  border-radius: 25px;
+
+  padding: 40px 30px;
+
+  transition: 0.3s;
+
+  box-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.mode-card:hover {
+  transform: translateY(-10px);
+
+  box-shadow: 0 0 30px rgba(255,255,255,0.25);
+}
+
+.icon {
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.mode-card h2 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.mode-card p {
+  color: #ddd;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.mode-card button {
+  width: 100%;
+
+  padding: 15px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.mode-card button {
+  background: #f5c542;
+  color: black;
+}
+
+.ai button {
+  background: #7b4dff;
+  color: white;
+}
+
+.mode-card button:hover {
+  transform: scale(1.05);
+}
